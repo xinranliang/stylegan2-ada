@@ -19,6 +19,19 @@ try:
 except ImportError:
     pyspng = None
 
+CLASSES = {
+    "airplane": 0,
+    "automobile": 1,
+    "bird": 2,
+    "cat": 3,
+    "deer": 4,
+    "dog": 5,
+    "frog": 6,
+    "horse": 7,
+    "ship": 8,
+    "truck": 9,
+}
+
 #----------------------------------------------------------------------------
 
 class Dataset(torch.utils.data.Dataset):
@@ -170,7 +183,7 @@ class ImageFolderDataset(Dataset):
             raise IOError('Path must point to a directory or zip')
 
         PIL.Image.init()
-        self._image_fnames = sorted(fname for fname in self._all_fnames if self._file_ext(fname) in PIL.Image.EXTENSION)
+        self._image_fnames = sorted(fname for fname in self._all_fnames if self._file_ext(fname) in PIL.Image.EXTENSION and "cifar10-train" not in fname)
         if len(self._image_fnames) == 0:
             raise IOError('No image files found in the specified path')
 
@@ -216,19 +229,21 @@ class ImageFolderDataset(Dataset):
                 image = np.array(PIL.Image.open(f))
         if image.ndim == 2:
             image = image[:, :, np.newaxis] # HW => HWC
+            image = np.repeat(image, 3, axis=2)
         image = image.transpose(2, 0, 1) # HWC => CHW
         return image
 
     def _load_raw_labels(self):
-        fname = 'dataset.json'
-        if fname not in self._all_fnames:
-            return None
-        with self._open_file(fname) as f:
-            labels = json.load(f)['labels']
-        if labels is None:
-            return None
-        labels = dict(labels)
-        labels = [labels[fname.replace('\\', '/')] for fname in self._image_fnames]
+        # fname = 'dataset.json'
+        # if fname not in self._all_fnames:
+            # return None
+        # with self._open_file(fname) as f:
+            # labels = json.load(f)['labels']
+        # if labels is None:
+            # return None
+        # labels = dict(labels)
+        # labels = [labels[fname.replace('\\', '/')] for fname in self._image_fnames]
+        labels = [CLASSES[fname.split("/")[0]] for fname in self._image_fnames]
         labels = np.array(labels)
         labels = labels.astype({1: np.int64, 2: np.float32}[labels.ndim])
         return labels

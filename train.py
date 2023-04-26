@@ -361,7 +361,7 @@ def setup_training_loop_kwargs(
 #----------------------------------------------------------------------------
 
 def subprocess_fn(rank, args, temp_dir):
-    dnnlib.util.Logger(file_name=os.path.join(args.run_dir, 'log.txt'), file_mode='a', should_flush=True)
+    # dnnlib.util.Logger(file_name=os.path.join(args.run_dir, 'log.txt'), file_mode='a', should_flush=True)
 
     # Init torch.distributed.
     if args.num_gpus > 1:
@@ -376,8 +376,9 @@ def subprocess_fn(rank, args, temp_dir):
     # Init torch_utils.
     sync_device = torch.device('cuda', rank) if args.num_gpus > 1 else None
     training_stats.init_multiprocessing(rank=rank, sync_device=sync_device)
-    if rank != 0:
-        custom_ops.verbosity = 'none'
+    # if rank != 0:
+        # custom_ops.verbosity = 'none'
+    custom_ops.verbosity = 'none'
 
     # Execute training loop.
     training_loop.training_loop(rank=rank, **args)
