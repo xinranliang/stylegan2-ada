@@ -1,2 +1,2 @@
 CUDA_VISIBLE_DEVICES=0 python generate.py --outdir=./logs/samples/imagenet --num-classes=10 --num-samples=100000 --batch-size=500 \
-    --network=./logs/train/00001-train-cond-auto1-batch128-noaug/network-snapshot-018432.pkl
+    --network=./logs/train/00001-train-cond-auto1-batch128-noaug/network-snapshot-025000.pkl
